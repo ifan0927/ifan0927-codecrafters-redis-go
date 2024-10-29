@@ -26,10 +26,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	c.Write([]byte("+PONG\r\n"))
-	var buffer []byte
-	c.Read(buffer)
-	c.Write([]byte("+PONG\r\n"))
-	c.Read(buffer)
+	for {
+		// 1. Read 阻塞等待新請求
+		var buffer []byte
+		c.Read(buffer)
 
+		// 2. 收到請求後處理
+
+		// 3. Write 發送響應
+		c.Write([]byte("+PONG\r\n"))
+
+		// 4. 循環回到 Read，再次等待新請求
+	}
 }
