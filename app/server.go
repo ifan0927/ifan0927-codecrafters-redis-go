@@ -29,5 +29,6 @@ func main() {
 	c.Write([]byte("+PONG\r\n"))
 	var buffer []byte
 	c.Read(buffer)
+	c.Write([]byte("+PONG\r\n"))
 
 }
