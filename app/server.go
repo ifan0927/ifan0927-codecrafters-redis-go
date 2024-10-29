@@ -26,7 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	for {
+	for i := 0; i < 2; i++ {
 		// 1. Read 阻塞等待新請求
 		var buffer []byte
 		c.Read(buffer)
