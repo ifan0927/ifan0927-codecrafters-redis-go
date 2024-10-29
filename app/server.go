@@ -19,19 +19,24 @@ func main() {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
 	}
+
 	c, err := l.Accept()
-	for {
-		if err != nil {
-			fmt.Println("Error accepting connection: ", err.Error())
-			os.Exit(1)
-		}
-		go handleRequest(c)
+	if err != nil {
+		fmt.Println("Error accepting connection: ", err.Error())
+		os.Exit(1)
 	}
 
-}
+	buffer := make([]byte, 1024)
+	for {
+		// 讀取請求
+		_, err := c.Read(buffer)
+		if err != nil {
+			fmt.Println("Error reading:", err)
+			return
+		}
 
-func handleRequest(con net.Conn) {
-	var buf []byte
-	con.Read(buf)
-	con.Write([]byte("+PONG\r\n"))
+		// 發送響應
+		c.Write([]byte("+PONG\r\n"))
+	}
+
 }
