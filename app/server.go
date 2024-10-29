@@ -32,7 +32,7 @@ func main() {
 
 func handleClient(conn net.Conn) {
 	defer conn.Close()
-	for {
+	for i := 0; i < 2; i++ {
 		conn.Write([]byte("+PONG\r\n"))
 	}
 }
