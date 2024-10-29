@@ -21,22 +21,27 @@ func main() {
 	}
 
 	c, err := l.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
+	for {
+		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
+		}
+		go handlerequest(c)
 	}
 
+}
+
+func handlerequest(conn net.Conn) {
 	buffer := make([]byte, 1024)
 	for {
 		// 讀取請求
-		_, err := c.Read(buffer)
+		_, err := conn.Read(buffer)
 		if err != nil {
 			fmt.Println("Error reading:", err)
 			return
 		}
 
 		// 發送響應
-		c.Write([]byte("+PONG\r\n"))
+		conn.Write([]byte("+PONG\r\n"))
 	}
-
 }
