@@ -25,9 +25,9 @@ func main() {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-	for {
-		var buffer []byte
-		c.Read(buffer)
-		c.Write([]byte("+PONG\r\n"))
-	}
+
+	c.Write([]byte("+PONG\r\n"))
+	var buffer []byte
+	c.Read(buffer)
+
 }
