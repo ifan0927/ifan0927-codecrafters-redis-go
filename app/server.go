@@ -41,7 +41,11 @@ func (h *EventHandler) handleEvent(event Event) {
 
 	} else if event.Type == EventWrite {
 		event.Conn.Write([]byte("+PONG\r\n"))
-		return
+		read_event := Event{
+			Type: EventRead,
+			Conn: event.Conn,
+		}
+		h.Loop.AddEvent(read_event)
 	}
 }
 func NewEventLoop() *EventLoop {
