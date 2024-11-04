@@ -33,21 +33,18 @@ type EventHandler struct {
 
 func (h *EventHandler) handleEvent(event Event) {
 	if event.Type == EventRead {
-		fmt.Printf("Entry Read")
-		fmt.Printf("1Length: %d", len(h.Loop.Queue))
 		write_event := Event{
 			Type: EventWrite,
 			Conn: event.Conn,
 		}
 		h.Loop.AddEvent(write_event)
-		fmt.Printf("2Length: %d", len(h.Loop.Queue))
 
 		read_event := Event{
 			Type: EventRead,
 			Conn: event.Conn,
 		}
 		h.Loop.AddEvent(read_event)
-		fmt.Printf("3Length: %d", len(h.Loop.Queue))
+
 	} else if event.Type == EventWrite {
 		event.Conn.Write([]byte("+PONG\r\n"))
 		return
@@ -79,7 +76,12 @@ func (el *EventLoop) Start() {
 }
 
 func (el *EventLoop) AddEvent(e Event) {
-	el.Queue <- e
+	select {
+	case el.Queue <- e:
+		fmt.Printf("Added event type: %d, queue length: %d\n", e.Type, len(el.Queue))
+	default:
+		fmt.Println("Queue is full, dropping event")
+	}
 }
 
 func main() {
