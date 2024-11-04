@@ -53,7 +53,7 @@ func (h *EventHandler) handleEvent(event Event) {
 func NewEventLoop() *EventLoop {
 	el := &EventLoop{
 		Running: false,
-		Queue:   make(chan Event),
+		Queue:   make(chan Event, 10),
 	}
 	handler := &EventHandler{
 		Loop: el,
