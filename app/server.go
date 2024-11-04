@@ -45,6 +45,7 @@ func (h *EventHandler) handleEvent(event Event) {
 			Conn: event.Conn,
 		}
 		h.Loop.AddEvent(read_event)
+		fmt.Printf("Length: %d", len(h.Loop.Queue))
 	} else if event.Type == EventWrite {
 		event.Conn.Write([]byte("+PONG\r\n"))
 		event.Conn.Close()
