@@ -33,11 +33,15 @@ type EventHandler struct {
 
 func (h *EventHandler) handleEvent(event Event) {
 	if event.Type == EventRead {
-		write_event := Event{
-			Type: EventWrite,
-			Conn: event.Conn,
+		buf := make([]byte, 1024)
+		n, _ := event.Conn.Read(buf)
+		if n > 0 {
+			write_event := Event{
+				Type: EventWrite,
+				Conn: event.Conn,
+			}
+			h.Loop.AddEvent(write_event)
 		}
-		h.Loop.AddEvent(write_event)
 
 		read_event := Event{
 			Type: EventRead,
