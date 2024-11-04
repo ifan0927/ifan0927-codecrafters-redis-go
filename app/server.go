@@ -50,7 +50,6 @@ func (h *EventHandler) handleEvent(event Event) {
 		fmt.Printf("3Length: %d", len(h.Loop.Queue))
 	} else if event.Type == EventWrite {
 		event.Conn.Write([]byte("+PONG\r\n"))
-		event.Conn.Close()
 		return
 	}
 }
