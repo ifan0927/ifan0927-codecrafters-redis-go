@@ -10,6 +10,67 @@ import (
 var _ = net.Listen
 var _ = os.Exit
 
+type EventType int
+
+const (
+	EventRead EventType = iota
+	EventWrite
+)
+
+type Event struct {
+	Type EventType
+	Conn net.Conn
+}
+
+type EventLoop struct {
+	Running bool
+	Queue   chan Event
+	handler *EventHandler
+}
+type EventHandler struct {
+	Loop *EventLoop
+}
+
+func (h *EventHandler) handleEvent(event Event) {
+	if event.Type == 0 {
+		e := Event{
+			Type: 1,
+			Conn: event.Conn,
+		}
+		h.Loop.AddEvent(e)
+	} else if event.Type == 1 {
+		event.Conn.Write([]byte("+PONG\r\n"))
+	}
+}
+func NewEventLoop() *EventLoop {
+	el := &EventLoop{
+		Running: false,
+		Queue:   make(chan Event),
+	}
+	handler := &EventHandler{
+		Loop: el,
+	}
+	el.handler = handler
+	return el
+}
+func (el *EventLoop) Start() {
+	if el.Running {
+		return
+	}
+	el.Running = true
+
+	go func() {
+		for {
+			event := <-el.Queue
+			el.handler.handleEvent(event)
+		}
+	}()
+}
+
+func (el *EventLoop) AddEvent(e Event) {
+	el.Queue <- e
+}
+
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests. 123
 	fmt.Println("Logs from your program will appear here!")
@@ -19,29 +80,19 @@ func main() {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
 	}
+	el := NewEventLoop()
+	el.Start()
 	for {
 		c, err := l.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
 		}
-		handlerequest(c)
-	}
-
-}
-
-func handlerequest(conn net.Conn) {
-	defer conn.Close()
-	buffer := make([]byte, 1024)
-	for {
-		// 讀取請求
-		_, err := conn.Read(buffer)
-		if err != nil {
-			fmt.Println("Error reading:", err)
-			return
+		e := Event{
+			Type: 0,
+			Conn: c,
 		}
-
-		// 發送響應
-		conn.Write([]byte("+PONG\r\n"))
+		el.AddEvent(e)
 	}
+
 }
