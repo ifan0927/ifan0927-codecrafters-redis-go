@@ -33,6 +33,7 @@ type EventHandler struct {
 
 func (h *EventHandler) handleEvent(event Event) {
 	if event.Type == EventRead {
+		fmt.Printf("Entry Read")
 		write_event := Event{
 			Type: EventWrite,
 			Conn: event.Conn,
